@@ -19,6 +19,7 @@ export default {
 
   effects: {
     *submitRegularForm({ payload }, { call }) {
+      console.log('submitRegularForm:', payload);
       yield call(fakeSubmitForm, payload);
       message.success('提交成功');
     },

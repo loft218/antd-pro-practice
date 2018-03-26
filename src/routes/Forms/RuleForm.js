@@ -8,13 +8,13 @@ import {
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-@Form.create()
+const status = ['关闭', '运行中', '已上线', '异常'];
 
+@Form.create()
 @connect(({ ruleForm, loading }) => ({
   ruleForm,
   loading: loading.effects['ruleForm/getOneRule'],
 }))
-
 export default class RuleForm extends PureComponent {
   componentDidMount() {
     console.log(this.props);
@@ -50,20 +50,18 @@ export default class RuleForm extends PureComponent {
   }
 
   handleSubmit = (e) => {
-    console.log('submit');
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      console.log(err);
-      if (!err) {
-        console.log(values);
-      }
+      if (err) return console.error(err);
+      this.props.dispatch({
+        type: 'ruleForm/submitRuleForm',
+        payload: values,
+      });
     });
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-
-    console.log(this.props);
 
     const formItemLayout = {
       labelCol: {
@@ -126,9 +124,11 @@ export default class RuleForm extends PureComponent {
                     initialValue: String(ruleForm.status),
                   })(
                     <Select placeholder="选择状态">
-                      <Select.Option value="1">状态1</Select.Option>
-                      <Select.Option value="2">状态2</Select.Option>
-                      <Select.Option value="3">状态3</Select.Option>
+                      {
+                        status.map(
+                          (elem, index) => (
+                            <Select.Option key={elem} value={String(index)}>{elem}</Select.Option>))
+                      }
                     </Select>)
                 }
 
@@ -137,6 +137,9 @@ export default class RuleForm extends PureComponent {
               <Form.Item {...formItemLayout} label="更新时间">
                 {
                   getFieldDecorator('updatedAt', {
+                    rules: [
+                      { required: true, message: '描述不能为空' },
+                    ],
                     initialValue: moment(ruleForm.updatedAt),
                   })(
                     <DatePicker

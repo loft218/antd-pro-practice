@@ -1,6 +1,9 @@
-import moment from 'moment';
-import { getOneRule } from '../services/api';
 
+import { routerRedux } from 'dva/router';
+import moment from 'moment';
+import { message } from 'antd';
+import { getOneRule, fakeSubmitForm } from '../services/api';
+import { delay } from '../utils/utils';
 
 export default {
   namespace: 'ruleForm',
@@ -20,6 +23,14 @@ export default {
         type: 'save',
         payload: response,
       });
+    },
+    *submitRuleForm({ payload }, { call, put }) {
+      console.log('submitRuleForm:', payload);
+      console.log('updatedAt:', payload.updatedAt.format('YYYY-MM-DD HH:mm:ss'));
+      yield call(fakeSubmitForm, payload);
+      message.success('提交成功');
+      yield delay(1000);
+      yield put(routerRedux.goBack());
     },
   },
 
