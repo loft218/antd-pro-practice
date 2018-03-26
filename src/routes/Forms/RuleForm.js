@@ -4,21 +4,22 @@ import { connect } from 'dva';
 import moment from 'moment';
 
 import {
-  Card, Form, Input, Select, DatePicker, Button,
+  Card, Form, Input, Select, DatePicker, Button, Spin,
 } from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 @Form.create()
 
-@connect(({ ruleForm }) => ({
+@connect(({ ruleForm, loading }) => ({
   ruleForm,
+  loading: loading.effects['ruleForm/getOneRule'],
 }))
 
 export default class RuleForm extends PureComponent {
   componentDidMount() {
     console.log(this.props);
     this.props.dispatch({
-      type: 'rule_form/getOneRule',
+      type: 'ruleForm/getOneRule',
       payload: {
         key: this.urlParams.id,
       },
@@ -27,7 +28,7 @@ export default class RuleForm extends PureComponent {
 
   componentWillUnmount() {
     this.props.dispatch({
-      type: 'rule_form/reset',
+      type: 'ruleForm/reset',
     });
   }
 
@@ -82,78 +83,81 @@ export default class RuleForm extends PureComponent {
       },
     };
 
-    const { ruleForm } = this.props;
+    const { ruleForm, loading } = this.props;
 
     return (
+
       <PageHeaderLayout title="编辑表单" content="编辑Rule表单">
         <Card bordered={false}>
-          <Form
-            onSubmit={this.handleSubmit}
-          >
-            <Form.Item {...formItemLayout} label="Key">
-              {
-                getFieldDecorator('key', {
-                  initialValue: ruleForm.key,
-                })(<Input placeholder="" disabled />)
-              }
-            </Form.Item>
-            <Form.Item {...formItemLayout} label="描述">
-              {
-                getFieldDecorator('description', {
-                  rules: [
-                    { required: true, message: '描述不能为空' },
-                  ],
-                  initialValue: ruleForm.description,
-                })(<Input placeholder="描述" />)
-              }
-            </Form.Item>
+          <Spin spinning={loading}>
 
-            <Form.Item {...formItemLayout} label="服务调用次数">
-              {
-                getFieldDecorator('callNo', {
-                  initialValue: ruleForm.callNo,
-                })(<Input placeholder="0" />)
-              }
-            </Form.Item>
+            <Form
+              onSubmit={this.handleSubmit}
+            >
+              <Form.Item {...formItemLayout} label="Key">
+                {
+                  getFieldDecorator('key', {
+                    initialValue: ruleForm.key,
+                  })(<Input placeholder="" disabled />)
+                }
+              </Form.Item>
+              <Form.Item {...formItemLayout} label="描述">
+                {
+                  getFieldDecorator('description', {
+                    rules: [
+                      { required: true, message: '描述不能为空' },
+                    ],
+                    initialValue: ruleForm.description,
+                  })(<Input placeholder="描述" />)
+                }
+              </Form.Item>
 
-            <Form.Item {...formItemLayout} label="状态">
-              {
-                getFieldDecorator('status', {
-                  initialValue: String(ruleForm.status),
-                })(
-                  <Select placeholder="选择状态">
-                    <Select.Option value="1">状态1</Select.Option>
-                    <Select.Option value="2">状态2</Select.Option>
-                    <Select.Option value="3">状态3</Select.Option>
-                  </Select>)
-              }
+              <Form.Item {...formItemLayout} label="服务调用次数">
+                {
+                  getFieldDecorator('callNo', {
+                    initialValue: ruleForm.callNo,
+                  })(<Input placeholder="0" />)
+                }
+              </Form.Item>
 
-            </Form.Item>
+              <Form.Item {...formItemLayout} label="状态">
+                {
+                  getFieldDecorator('status', {
+                    initialValue: String(ruleForm.status),
+                  })(
+                    <Select placeholder="选择状态">
+                      <Select.Option value="1">状态1</Select.Option>
+                      <Select.Option value="2">状态2</Select.Option>
+                      <Select.Option value="3">状态3</Select.Option>
+                    </Select>)
+                }
 
-            <Form.Item {...formItemLayout} label="更新时间">
-              {
-                getFieldDecorator('updatedAt', {
-                  initialValue: moment(ruleForm.updatedAt),
-                })(
-                  <DatePicker
-                    showTime
-                    format="YYYY-MM-DD HH:mm:ss"
-                    placeholder="选择时间"
-                    onChange={this.handleDateChange}
-                    onOk={this.handleDateOk}
-                  />
-                )
-              }
-            </Form.Item>
+              </Form.Item>
 
-            <Form.Item {...submitFormLayout}>
-              <Button type="primary" htmlType="submit">
-                提交
-              </Button>
-            </Form.Item>
-          </Form>
+              <Form.Item {...formItemLayout} label="更新时间">
+                {
+                  getFieldDecorator('updatedAt', {
+                    initialValue: moment(ruleForm.updatedAt),
+                  })(
+                    <DatePicker
+                      showTime
+                      format="YYYY-MM-DD HH:mm:ss"
+                      placeholder="选择时间"
+                      onChange={this.handleDateChange}
+                      onOk={this.handleDateOk}
+                    />
+                  )
+                }
+              </Form.Item>
+
+              <Form.Item {...submitFormLayout}>
+                <Button type="primary" htmlType="submit">提交</Button>
+              </Form.Item>
+            </Form>
+          </Spin>
         </Card>
       </PageHeaderLayout>
+
     );
   }
 }

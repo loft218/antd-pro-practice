@@ -3,7 +3,7 @@ import { getOneRule } from '../services/api';
 
 
 export default {
-  namespace: 'rule_form',
+  namespace: 'ruleForm',
 
   state: {
     key: 0,
@@ -16,7 +16,6 @@ export default {
   effects: {
     *getOneRule({ payload }, { call, put }) {
       const response = yield call(getOneRule, payload);
-      console.log(response);
       yield put({
         type: 'save',
         payload: response,
